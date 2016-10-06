@@ -1,0 +1,23 @@
+{
+  "name": "f-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jessica-jordan/f-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jessica-jordan/f-backend/issues"
+  },
+  "homepage": "https://github.com/jessica-jordan/f-backend#readme",
+  "dependencies": {
+    "exceljs": "^0.2.24",
+    "express": "^4.14.0"
+  }
+}
