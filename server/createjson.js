@@ -27,13 +27,13 @@ exports.create = function(sourceFile){
   var resultJSON = JSON.stringify({
     "data": smArray
   });
-  fs.writeFile("server/data/excelmod.json", resultJSON, function(err){
+  fs.writeFile("./server/data/excelmod.json", resultJSON, function(err){
     if (err) {
       return console.log(err);
     }
 
     myEmitter.emit('hola');
-    console.log("File successfully saved: " + "server/data/excelmod.json");
+    console.log("File successfully saved: " + "./server/data/excelmod.json");
   });
 
 }
