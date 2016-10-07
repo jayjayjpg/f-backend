@@ -11,7 +11,9 @@ var mutJson;
 const formatJson = require('./server/createjson');
 const mainEmitter = formatJson.mEvents;
 const MongoClient = require('mongodb').MongoClient;
-var entityData;
+var entityData = {};
+var snpData = {};
+var dataPile = [];
 
 MongoClient.connect('mongodb://localhost:27017', function(err, database){
   if (err) {
@@ -19,8 +21,15 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   }
   db = database;
   app.listen(portNum, function(){
+    dataPile = [];
     console.log("listening on port " + portNum);
     jsonFromExcel.create(formatJson.create);
+    entityData.data = require('./server/data/excel.json');
+    entityData.name = "entities";
+    snpData.data = require('./server/data/snps.json');
+    snpData.name = "snps";
+    dataPile.push(entityData);
+    dataPile.push(snpData);
   });
 });
   // var mocks      = globSync('./mocks/**/*.js', { cwd: __dirname }).map(require);
@@ -30,49 +39,38 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   // var morgan  = require('morgan');
   // app.use(morgan('dev'));
 
-  app.on('listening', function(){
-    if (cnt < 1){
-      console.log("started up express!!");
-      console.log("loaded " + cnt + " times.");
-    // mainEmitter.on('hola', () => {
-    // });
-      cnt +=1;
-    }
-    next();
-  });
 
   app.use(function(req, res, next){
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
     res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-    entityData = require('./server/data/excel.json');
     next();
   });
 
   app.get('/api/mutations', function(req, res) {
-    /*const preprocessData = execFile('./createjsonfromexcel.js', (error, stdout, stderr) => {
-      if (error){
-        throw error;
-      }
-      console.log(stdout);
-    });*/
-   // mainEmitter.on('hola', () => {
       res.header("Content-Type","application/vnd.api+json"); 
-      mutJson = JSON.parse(fs.readFileSync('./server/data/excelmod.json'));
-      res.send(mutJson);
-   // });
-
-
-   // formatJson.create();
-
+      // mutJson = JSON.parse(fs.readFileSync('./server/data/excelmod.json'));
+      // res.send(mutJson);
+      db.collection('entities').find().toArray(function(err, response){
+        res.send(response); // TODO: send the response in seperate function in component desired format
+      });
   });
+
   app.get('/api/seed', function(req, res){
-    entityData.forEach(function(currentJson){
-      db.collection('entities').save(currentJson, function(err, res){
-        if (err){
-          return console.log(err);
-        }
-        console.log('saved to database');
+    var dataSetName;
+    db.collection('entitites').remove({}); // drop all collections before reseed
+    db.collection('snps').remove({});
+    dataPile.forEach(function(dataSet){
+      dataSetName = dataSet.name;
+      dataSet.data.forEach(function(currentJson, index){
+        db.collection(dataSetName).save(currentJson, function(err, res){
+          if (err){
+            return console.log(err);
+          }
+          if (index % 20 === 0){
+            console.log("index" + index + ": saves to database " + JSON.stringify(currentJson));
+          }
+        });
       });
     });
 
