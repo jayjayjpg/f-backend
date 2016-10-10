@@ -51,7 +51,7 @@ exports.create = function (processCallback){
           obj.rsId = row.getCell(1).value;
           obj.score = row.getCell(i+2).value;
           dataArr.push(obj);
-          console.log('Row ' + rowNumber + " " + JSON.stringify(obj));
+          // console.log('Row ' + rowNumber + " " + JSON.stringify(obj));
         }
       });   
     }
@@ -73,7 +73,7 @@ exports.create = function (processCallback){
       obj.rsId = row.getCell(1).value;
       obj.genomicRegion = row.getCell(2).value;
       dataArr.push(obj);
-      console.log('Row ' + i + " " + JSON.stringify(obj)); 
+     // console.log('Row ' + i + " " + JSON.stringify(obj)); 
     }
     emitter.emit(evName);
     saveDataToJSON(dataArr, resultFilePath, evName);

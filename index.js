@@ -4,16 +4,21 @@ const portNum = 4100;
 const fs = require('fs');
 var cnt = 0;
 var db;
-// var globSync   = require('glob').sync;
-const execFile = require('child_process').execFile;
-const jsonFromExcel = require('./server/createjsonfromexcel');
 var mutJson;
-const formatJson = require('./server/createjson');
-const mainEmitter = formatJson.mEvents;
 const MongoClient = require('mongodb').MongoClient;
 var entityData = {};
 var snpData = {};
 var dataPile = [];
+
+// var globSync   = require('glob').sync;
+const execFile = require('child_process').execFile;
+app.locals.jsonFromExcel = require('./server/createjsonfromexcel');
+app.locals.formatJson = require('./server/createjson');
+app.locals.jsonApiFormatter = require('./server/jsonApiFormatter');
+
+
+const mainEmitter = app.locals.formatJson.mEvents;
+
 
 MongoClient.connect('mongodb://localhost:27017', function(err, database){
   if (err) {
@@ -23,7 +28,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   app.listen(portNum, function(){
     dataPile = [];
     console.log("listening on port " + portNum);
-    jsonFromExcel.create(formatJson.create);
+    app.locals.jsonFromExcel.create();
     entityData.data = require('./server/data/excel.json');
     entityData.name = "entities";
     snpData.data = require('./server/data/snps.json');
@@ -49,16 +54,20 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
 
   app.get('/api/mutations', function(req, res) {
       res.header("Content-Type","application/vnd.api+json"); 
+      app.locals.jsonApiFormatter.jsonToJsonApi({"id": 1}, "mutation");
+      app.locals.jsonApiFormatter.jsonToJsonApi([{"id": 1},{"id": 2}], "aspiration");
       // mutJson = JSON.parse(fs.readFileSync('./server/data/excelmod.json'));
       // res.send(mutJson);
       db.collection('entities').find().toArray(function(err, response){
-        res.send(response); // TODO: send the response in seperate function in component desired format
+       // console.log("app.get mutations response: " + JSON.stringify(response));
+        var jsonApiResponse = app.locals.jsonApiFormatter.jsonToJsonApi(response, "mutation");
+        res.send(jsonApiResponse); // TODO: send the response in seperate function in component desired format
       });
   });
 
   app.get('/api/seed', function(req, res){
     var dataSetName;
-    db.collection('entitites').remove({}); // drop all collections before reseed
+    db.collection('entities').remove({}); // drop all collections before reseed
     db.collection('snps').remove({});
     dataPile.forEach(function(dataSet){
       dataSetName = dataSet.name;
@@ -67,11 +76,12 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
           if (err){
             return console.log(err);
           }
-          if (index % 20 === 0){
+         /* if (index % 20 === 0){
             console.log("index" + index + ": saves to database " + JSON.stringify(currentJson));
-          }
+          } */
         });
       });
+      console.log(dataSetName + " has been successfully saved in the db.");
     });
 
     res.redirect('/');
