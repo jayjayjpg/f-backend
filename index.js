@@ -53,16 +53,23 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   });
 
   app.get('/api/mutations', function(req, res) {
+      var rsParam = req.query.rsId; // sample rsIds: rs2425019 rs6088765 rs7404095
       res.header("Content-Type","application/vnd.api+json"); 
-      app.locals.jsonApiFormatter.jsonToJsonApi({"id": 1}, "mutation");
-      app.locals.jsonApiFormatter.jsonToJsonApi([{"id": 1},{"id": 2}], "aspiration");
-      // mutJson = JSON.parse(fs.readFileSync('./server/data/excelmod.json'));
-      // res.send(mutJson);
-      db.collection('entities').find().toArray(function(err, response){
+      db.collection('entities').find({rsId: rsParam }).toArray(function(err, response){
        // console.log("app.get mutations response: " + JSON.stringify(response));
         var jsonApiResponse = app.locals.jsonApiFormatter.jsonToJsonApi(response, "mutation");
-        res.send(jsonApiResponse); // TODO: send the response in seperate function in component desired format
+        res.send(jsonApiResponse); 
+       // res.send(rsParam);
       });
+  });
+  
+
+  app.get('/api/snps', function(req, res){
+    res.header("Content-Type","application/vdn.api+json");
+    db.collection('snps').find().toArray(function(err, response){
+      var jsonSnpRes = app.locals.jsonApiFormatter.jsonToJsonApi(response, "snp");
+      res.send(jsonSnpRes);
+    });
   });
 
   app.get('/api/seed', function(req, res){
