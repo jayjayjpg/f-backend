@@ -55,9 +55,13 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   app.get('/api/mutations', function(req, res) {
       // can now filter for single snp by rsId. E.g /api/mutations?rsId=rs2425019
       // can now query for several rsIds in one call: /api/mutations?rs2425019,rs6088765
-      var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
+      var queryObj = {};
+      if (req.query.rsId != undefined){
+        var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
+        queryObj = {rsId: { $in: rsParam } };
+      }
       res.header("Content-Type","application/vnd.api+json"); 
-      db.collection('entities').find({rsId: { $in: rsParam } }).toArray(function(err, response){
+      db.collection('entities').find(queryObj).toArray(function(err, response){
        // console.log("app.get mutations response: " + JSON.stringify(response));
         var jsonApiResponse = app.locals.jsonApiFormatter.jsonToJsonApi(response, "mutation");
         res.send(jsonApiResponse); 
@@ -67,8 +71,13 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   
 
   app.get('/api/snps', function(req, res){
+      var queryObj = {};
+      if (req.query.region != undefined){
+        var regionType = req.query.region.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
+        queryObj = {genomicRegion: { $in: regionType } };
+      }
     res.header("Content-Type","application/vdn.api+json");
-    db.collection('snps').find().toArray(function(err, response){
+    db.collection('snps').find(queryObj).toArray(function(err, response){
       var jsonSnpRes = app.locals.jsonApiFormatter.jsonToJsonApi(response, "snp");
       res.send(jsonSnpRes);
     });
