@@ -53,6 +53,8 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   });
 
   app.get('/api/mutations', function(req, res) {
+      // can now filter for single snp by rsId. E.g /api/mutations?rsId=rs2425019
+      // TODO: add querying for several rsIds in one call: /api/mutations?rs2425019,rs6088765
       var rsParam = req.query.rsId; // sample rsIds: rs2425019 rs6088765 rs7404095
       res.header("Content-Type","application/vnd.api+json"); 
       db.collection('entities').find({rsId: rsParam }).toArray(function(err, response){
