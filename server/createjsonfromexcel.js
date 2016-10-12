@@ -65,10 +65,10 @@ exports.create = function (processCallback){
     var colFunc = worksheet.getColumn(2);
     var resultFilePath = "./server/data/snps.json";
     var row;
-    var obj = {};
 
     //console.log("cell 1 val: " + row.getCell(1).value);
     for (var i = 1; i < 197; i += 1){
+      var obj = {};
       row = worksheet.getRow(i);
       obj.rsId = row.getCell(1).value;
       obj.genomicRegion = row.getCell(2).value;
