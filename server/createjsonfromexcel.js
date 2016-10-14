@@ -40,9 +40,9 @@ exports.create = function (processCallback){
     var resultFilePath = "./server/data/excel.json";
 
     //console.log("cell 1 val: " + row.getCell(1).value);
-    for (var i = 0; i < 58; i += 1){
-      var labelVal = worksheet.getRow(1).values[i+2];
-      worksheet.eachRow(function(row, rowNumber){
+    worksheet.eachRow(function(row, rowNumber){
+      for (var i = 0; i < 58; i += 1){
+        var labelVal = worksheet.getRow(1).values[i+2];
         
         if (rowNumber > 1){
           var obj = {};
@@ -52,9 +52,10 @@ exports.create = function (processCallback){
           obj.score = row.getCell(i+2).value;
           dataArr.push(obj);
           // console.log('Row ' + rowNumber + " " + JSON.stringify(obj));
-        }
-      });   
-    }
+          // TODO: check how API response has to look like to ensure correct value - label mapping in heatmap. UPDATE: already sorted?
+        }   
+      }
+    });
     emitter.emit(evName);
     saveDataToJSON(dataArr, resultFilePath, evName);
   }
