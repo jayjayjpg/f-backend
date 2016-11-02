@@ -22,16 +22,12 @@ exports.create = function (processCallback){
   getDataFromWorkbook(fileInputSnps, 'snpsReady', getSnps);
   getDataFromWorkbook(fileInputEntities, 'entitiesReady', getEntities);
   emitter.on('entitiesReady', function(){
-   //  console.log("resulting array: " + JSON.stringify(myEntityData));
     console.log("processed entities.");
   });
   emitter.on('snpsReady', function(){
-   //  console.log("resulting array: " + JSON.stringify(myEntityData));
     console.log("processed Snps.");
   });
 
-      // }); 
-  //}
 
   function getEntities(dataArr, evName){
     var worksheet = workbook.getWorksheet(1);
@@ -39,7 +35,6 @@ exports.create = function (processCallback){
     var colScore = worksheet.getColumn(2);
     var resultFilePath = "./server/data/excel.json";
 
-    //console.log("cell 1 val: " + row.getCell(1).value);
     worksheet.eachRow(function(row, rowNumber){
       for (var i = 0; i < 58; i += 1){
         var labelVal = worksheet.getRow(1).values[i+2];
@@ -51,8 +46,6 @@ exports.create = function (processCallback){
           obj.rsId = row.getCell(1).value;
           obj.score = row.getCell(i+2).value;
           dataArr.push(obj);
-          // console.log('Row ' + rowNumber + " " + JSON.stringify(obj));
-          // TODO: check how API response has to look like to ensure correct value - label mapping in heatmap. UPDATE: already sorted?
         }   
       }
     });
@@ -67,14 +60,12 @@ exports.create = function (processCallback){
     var resultFilePath = "./server/data/snps.json";
     var row;
 
-    //console.log("cell 1 val: " + row.getCell(1).value);
     for (var i = 1; i < 197; i += 1){
       var obj = {};
       row = worksheet.getRow(i);
       obj.rsId = row.getCell(1).value;
-      obj.genomicRegion = row.getCell(2).value;
+      obj.genomicRegion = row.getCell(2).value.toLowerCase();
       dataArr.push(obj);
-     // console.log('Row ' + i + " " + JSON.stringify(obj)); 
     }
     emitter.emit(evName);
     saveDataToJSON(dataArr, resultFilePath, evName);
@@ -88,7 +79,6 @@ exports.create = function (processCallback){
         return console.log(err);
       }
       console.log(processName + "JSON file successfully saved: " + resFilePath);
-      // processCallback(resFilePath);
     }); 
   }
 }
