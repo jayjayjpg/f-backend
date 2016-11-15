@@ -8,6 +8,7 @@ var mutJson;
 const MongoClient = require('mongodb').MongoClient;
 var entityData = {};
 var snpData = {};
+var interactionsData = {};
 var dataPile = [];
 
 // var globSync   = require('glob').sync;
@@ -33,8 +34,11 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
     entityData.name = "entities";
     snpData.data = require('./server/data/snps.json');
     snpData.name = "snps";
+    interactionsData.data = require('./server/data/interact.json');
+    interactionsData.name = "interactions";
     dataPile.push(entityData);
     dataPile.push(snpData);
+    dataPile.push(interactionsData);
   });
 });
   // var mocks      = globSync('./mocks/**/*.js', { cwd: __dirname }).map(require);
@@ -76,10 +80,23 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
         var regionType = req.query.region.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
         queryObj = {genomicRegion: { $in: regionType } };
       }
+      if (req.query.rsId != undefined){
+        var rsId = req.query.rsId.split(",");
+        queryObj.rsId = { $in: rsId };
+      }
     res.header("Content-Type","application/vdn.api+json");
     db.collection('snps').find(queryObj).toArray(function(err, response){
       var jsonSnpRes = app.locals.jsonApiFormatter.jsonToJsonApi(response, "snp");
       res.send(jsonSnpRes);
+    });
+  });
+  
+  app.get('/api/interactions', function(req, res){
+    var queryObj = {};
+    res.header("Content-Type","application/vdn.api+json");
+    db.collection('interactions').find(queryObj).toArray(function(err, response){
+      var jsonIntRes = app.locals.jsonApiFormatter.jsonToJsonApi(response, "interaction");
+      res.send(jsonIntRes);
     });
   });
 
@@ -87,6 +104,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
     var dataSetName;
     db.collection('entities').remove({}); // drop all collections before reseed
     db.collection('snps').remove({});
+    db.collection('interactions').remove({});
     dataPile.forEach(function(dataSet){
       dataSetName = dataSet.name;
       dataSet.data.forEach(function(currentJson, index){
@@ -94,9 +112,6 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
           if (err){
             return console.log(err);
           }
-         /* if (index % 20 === 0){
-            console.log("index" + index + ": saves to database " + JSON.stringify(currentJson));
-          } */
         });
       });
       console.log(dataSetName + " has been successfully saved in the db.");
