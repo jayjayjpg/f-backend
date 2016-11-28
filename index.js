@@ -48,15 +48,29 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   // var morgan  = require('morgan');
   // app.use(morgan('dev'));
 
+  if(process.env.NODE_ENV === 'development') {
+    app.use(function(req, res, next){
+      res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+      next();
+    });
+  };
 
-  app.use(function(req, res, next){
-    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:4200');
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
-    next();
-  });
+  if(process.env.NODE_ENV === 'production') {
+    app.use(function(req, res, next){
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+      res.header('Access-Control-Allow-Methods', 'POST, GET, PUT, DELETE, OPTIONS');
+      if (req.method == 'OPTIONS') {
+        res.status(200).end();
+      } else {
+        next();
+      }
+    });
+  };
 
-  app.get('/api/mutations', function(req, res) {
+  app.get('/api/v1/mutations', function(req, res) {
       // can now filter for single snp by rsId. E.g /api/mutations?rsId=rs2425019
       // can now query for several rsIds in one call: /api/mutations?rs2425019,rs6088765
       var queryObj = {};
@@ -74,7 +88,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
   });
   
 
-  app.get('/api/snps', function(req, res){
+  app.get('/api/v1/snps', function(req, res){
       var queryObj = {};
       if (req.query.region != undefined){
         var regionType = req.query.region.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
@@ -91,8 +105,12 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
     });
   });
   
-  app.get('/api/interactions', function(req, res){
+  app.get('/api/v1/interactions', function(req, res){
     var queryObj = {};
+    if (req.query.rsId != undefined){
+      var rsIds = req.query.rsId.split(",");
+      queryObj.targetSnp = { $in: rsIds };
+    }
     res.header("Content-Type","application/vdn.api+json");
     db.collection('interactions').find(queryObj).toArray(function(err, response){
       var jsonIntRes = app.locals.jsonApiFormatter.jsonToJsonApi(response, "interaction");
@@ -100,7 +118,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
     });
   });
 
-  app.get('/api/seed', function(req, res){
+  app.get('/api/v1/seed', function(req, res){
     var dataSetName;
     db.collection('entities').remove({}); // drop all collections before reseed
     db.collection('snps').remove({});
@@ -120,13 +138,13 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
     res.redirect('/');
   });
 
-  app.get('/api/interactions', function(req,res) {
+  /* app.get('/api/interactions', function(req,res) {
      jsonFromExcel.create(formatJson.create);
      mainEmitter.on('hola', () => {
         const inst = fs.readFileSync('./server/data/interactions.tsv');
         res.send(inst);
      });
-  });
+  }); */
   
   
 

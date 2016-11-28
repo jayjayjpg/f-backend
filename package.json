@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --ignore 'server/data/*' index.js",
+    "dev": "NODE_ENV=development nodemon --ignore 'server/data/*' index.js",
+    "start": "node index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -18,9 +19,12 @@
   },
   "homepage": "https://github.com/jessica-jordan/f-backend#readme",
   "dependencies": {
+    "body-parser": "^1.15.2",
     "exceljs": "^0.2.24",
     "express": "^4.14.0",
-    "mongodb": "^2.2.10"
+    "jwt-simple": "^0.5.1",
+    "mongodb": "^2.2.10",
+    "morgan": "^1.7.0"
   },
   "devDependencies": {
     "nodemon": "^1.10.2"
