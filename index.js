@@ -1,15 +1,23 @@
 const express = require('express');
 const app = express();
 const portNum = 4100;
+const MongoClient = require('mongodb').MongoClient,
+      mongoose = require('mongoose'),
+      bodyParser = require('body-parser'),
+      logger = require('morgan');
 const fs = require('fs');
 var cnt = 0;
 var db;
 var mutJson;
-const MongoClient = require('mongodb').MongoClient;
 var entityData = {};
 var snpData = {};
 var interactionsData = {};
 var dataPile = [];
+var router = express.Router();
+var config = require('./config/main');
+const router = require('./router'); 
+
+// var auth = require('./server/auth.js');
 
 // var globSync   = require('glob').sync;
 const execFile = require('child_process').execFile;
@@ -21,7 +29,11 @@ app.locals.jsonApiFormatter = require('./server/jsonApiFormatter');
 const mainEmitter = app.locals.formatJson.mEvents;
 
 
-MongoClient.connect('mongodb://localhost:27017', function(err, database){
+mongoose.connect(config.database);
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(bodyParser.json());
+
+/* function(err, database){
   if (err) {
     return console.log(err);
   }
@@ -40,7 +52,7 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
     dataPile.push(snpData);
     dataPile.push(interactionsData);
   });
-});
+}); */
   // var mocks      = globSync('./mocks/**/*.js', { cwd: __dirname }).map(require);
   // var proxies    = globSync('./proxies/**/*.js', { cwd: __dirname }).map(require); 
 
@@ -69,6 +81,10 @@ MongoClient.connect('mongodb://localhost:27017', function(err, database){
       }
     });
   };
+ // authentication middleware
+ // app.all('/api/v1/*', [require('./middlewares/validateRequest')]);
+  
+  // router.post('/login', auth.login);
 
   app.get('/api/v1/mutations', function(req, res) {
       // can now filter for single snp by rsId. E.g /api/mutations?rsId=rs2425019
