@@ -1,8 +1,7 @@
 const express = require('express');
 const app = express();
 const portNum = 4100;
-const MongoClient = require('mongodb').MongoClient,
-      mongoose = require('mongoose'),
+const mongoose = require('mongoose'),
       bodyParser = require('body-parser'),
       logger = require('morgan');
 const fs = require('fs');

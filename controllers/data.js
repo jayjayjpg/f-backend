@@ -1,5 +1,6 @@
 const Mutation = require('../models/mutation'),
       Snp = require('../models/snp'),
+      Interaction = require('../models/interaction'),
       config = require('../config/main'); 
 
   const jsonFromExcel = require('../server/createjsonfromexcel');
@@ -26,9 +27,6 @@ exports.mutations = function(req, res, next) {
     if (err) { 
       return next(err); 
     }
-    //console.log("1. Mongoose Response: " + muts);
-    // var jsonApiResponse = jsonApiFormatter.jsonToJsonApi(muts, "mutation");
-    // console.log("2. Mutations JSON Response: " + JSON.stringify(jsonApiResponse));
     muts.forEach(function(mut, index){
       mutArr.push({
         id: index,
@@ -42,16 +40,13 @@ exports.mutations = function(req, res, next) {
     res.status(200).send(jsonRes);
   
   });
-  //res.status(401).json({ error: 'You are not authorized to view this content.' });
-  //return next('Unauthorized');
+
 };
 
 //========================================
 // Snps Route /apiNameSpace/snps
 //========================================
 exports.snps = function(req, res, next) {
-  // can now filter for single snp by rsId. E.g /api/mutations?rsId=rs2425019
-  // can now query for several rsIds in one call: /api/mutations?rs2425019,rs6088765
   var queryObj = {};
   var snpArr = [];
   if (req.query.rsId != undefined){
@@ -63,9 +58,7 @@ exports.snps = function(req, res, next) {
     if (err) { 
       return next(err); 
     }
-    //console.log("1. Mongoose Response: " + muts);
-    // var jsonApiResponse = jsonApiFormatter.jsonToJsonApi(muts, "mutation");
-    // console.log("2. Mutations JSON Response: " + JSON.stringify(jsonApiResponse));
+
     snps.forEach(function(snp, index){
       snpArr.push({
         id: index,
@@ -78,14 +71,48 @@ exports.snps = function(req, res, next) {
     res.status(200).send(jsonRes);
   
   });
-  //res.status(401).json({ error: 'You are not authorized to view this content.' });
-  //return next('Unauthorized');
+
+};
+
+//========================================
+// Snps Route /apiNameSpace/snps
+//========================================
+exports.interactions = function(req, res, next) {
+
+  var queryObj = {};
+  var intArr = [];
+  if (req.query.rsId != undefined){
+    var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
+    queryObj = {rsId: { $in: rsParam } };
+  }
+
+  Interaction.find({}, function(err, interactions){
+    if (err) { 
+      return next(err); 
+    }
+
+    interactions.forEach(function(interaction, index){
+      intArr.push({
+        id: index,
+        actor: interaction.actor,
+        actorId: interaction.actorId,
+        target: interaction.target,
+        targetSnp: interaction.targetSnp
+      });
+    });
+    let jsonRes = jsonApiFormatter.jsonToJsonApi(intArr, "interaction");
+    res.header("Content-Type","application/vnd.api+json");
+    res.status(200).send(jsonRes);
+  
+  });
+
 };
 
 
 exports.seedData = function(req, res){
   seedMutations(req,res);
   seedSnps(req,res);
+  seedInteractions(req,res);
   res.status(200).send("succesfully saved mutations + snps data in database.");
 };
 
@@ -103,12 +130,10 @@ function seedMutations(req, res){
       rsId: currentJson.rsId,
       score: currentJson.score
     }); 
-    // console.log("mut model: " + JSON.stringify(mut));
     mut.save(function(err, mut){
       if (err){
         return console.log(err);
       }
-      // console.log(dataSetName + " has been successfully saved in the db.");
     });
   }); 
   // res.status(200).send("succesfully saved mutations data in database.");
@@ -128,6 +153,30 @@ function seedSnps(req, res){
     }); 
     // console.log("mut model: " + JSON.stringify(mut));
     snp.save(function(err, snp){
+      if (err){
+        return console.log(err);
+      }
+      // console.log(dataSetName + " has been successfully saved in the db.");
+    });
+  });
+};
+
+function seedInteractions(req, res){
+  let dataSetName = "interaction";
+  Snp.db.db.dropCollection('interactions'); // dropping collections only works with colllection name in plural 
+  let dataSet = data[2];
+  let interact;
+  dataSet.data.forEach(function(currentJson, index){
+    // onsole.log("JSON current mut: " + JSON.stringify(currentJson));
+    // example json: {"entityId":"mutMatrix","patientId":"IW3157131","rsId":"rs6940798","score":1}
+    interact = new Interaction({
+      actorId: currentJson.actorId,
+      actor: currentJson.actor,
+      target: currentJson.target,
+      targetSnp: currentJson.targetSnp
+    }); 
+    // console.log("mut model: " + JSON.stringify(mut));
+    interact.save(function(err, interact){
       if (err){
         return console.log(err);
       }
