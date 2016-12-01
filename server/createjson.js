@@ -25,7 +25,7 @@ exports.create = function(sourceFile){
   var smArray = resArr;
   console.log("new mut object: " + JSON.stringify(resArr[0]));
   var resultJSON = JSON.stringify({
-    "data": smArray
+    data: smArray
   });
   fs.writeFile("./server/data/excelmod.json", resultJSON, function(err){
     if (err) {
