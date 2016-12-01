@@ -42,11 +42,12 @@ module.exports = function(app, data) {
     res.send('It worked! User id is: ' + req.user._id + '.');
   });
 
-  apiRoutes.get('/seed', passport.authenticate('jwt', { session: false }), DataController.seedMutations );
+  apiRoutes.get('/seed', passport.authenticate('jwt', { session: false }), DataController.seedData );
 
   apiRoutes.get('/mutations', passport.authenticate('jwt', { session: false }), DataController.mutations);
+  apiRoutes.get('/snps', passport.authenticate('jwt', { session: false }), DataController.snps); // TODO: activate controller method for queryng snps
 
-  apiRoutes.get('/snps', function(req, res){
+  /* apiRoutes.get('/snps', function(req, res){
       var queryObj = {};
       if (req.query.region != undefined){
         var regionType = req.query.region.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
@@ -61,7 +62,7 @@ module.exports = function(app, data) {
       var jsonSnpRes = app.locals.jsonApiFormatter.jsonToJsonApi(response, "snp");
       res.send(jsonSnpRes);
     });
-  });
+  }); */
   
   apiRoutes.get('/interactions', function(req, res){
     var queryObj = {};
