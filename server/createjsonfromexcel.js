@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Excel = require('exceljs');
 const dataFiles = {
-  'entities': './server/interactions2.xlsx',
+  'mutations': './server/interactions2.xlsx',
   'snps': './server/SNPannotation.xlsx',
   'interactions': './server/isnpnetwork.xlsx'
 };
@@ -21,11 +21,8 @@ exports.create = function (processCallback){
         dataCallback(resArray, eventName);
     });
   }
-
-  processingFunc.dummy = function(){
-    console.log("yeah whatever, call me if you want.");
-  }
-  processingFunc.getentities  = function(dataArr, evName){
+  
+  processingFunc.getmutations  = function(dataArr, evName){
     var worksheet = workbook.getWorksheet(1);
     var col = worksheet.getColumn(1);
     var colScore = worksheet.getColumn(2);
