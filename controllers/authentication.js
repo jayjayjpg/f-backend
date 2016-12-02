@@ -38,10 +38,12 @@ exports.login = function(req, res, next) {
 //========================================
 exports.register = function(req, res, next) {  
   // Check for registration errors
-  const email = req.body.email;
-  const firstName = req.body.firstName;
-  const lastName = req.body.lastName;
-  const password = req.body.password;
+  const email = req.body["email"];
+  const firstName = req.body["firstName"];
+  const lastName = req.body["lastName"];
+  const password = req.body["password"];
+  
+ // console.log("request body is: " + JSON.stringify(req.body));
 
   // Return error if no email provided
   if (!email) {
