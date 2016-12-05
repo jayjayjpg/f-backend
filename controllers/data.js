@@ -20,7 +20,7 @@ exports.mutations = function(req, res, next) {
   var mutArr = [];
   if (req.query.rsId != undefined){
     var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
-    queryObj = {rsId: { $in: rsParam } };
+    queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
 
   Mutation.find({}, function(err, muts){
@@ -51,7 +51,7 @@ exports.snps = function(req, res, next) {
   var snpArr = [];
   if (req.query.rsId != undefined){
     var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
-    queryObj = {rsId: { $in: rsParam } };
+    queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
 
   Snp.find({}, function(err, snps){
@@ -83,7 +83,7 @@ exports.interactions = function(req, res, next) {
   var intArr = [];
   if (req.query.rsId != undefined){
     var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
-    queryObj = {rsId: { $in: rsParam } };
+    queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
 
   Interaction.find({}, function(err, interactions){

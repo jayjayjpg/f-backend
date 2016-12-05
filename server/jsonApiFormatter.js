@@ -1,35 +1,33 @@
 const fs = require('fs');
 
-exports.jsonToJsonApi = function(jsonObj, typeName){
-   //console.log("jsontoJsonApi check object type: " + JSON.stringify(jsonObj) + " is an " + jsonObj.constructor);
-  //console.log("successful import jsonformatter - delete ol jsonformat file");
+exports.jsonToJsonApi = function(allData, typeName){
+
     function dasherize(string){
       return string.replace(/([a-z])([A-Z])/g, '$1-$2').toLowerCase();
     }
-   if (jsonObj.constructor === Array){
-      console.log("input is an array");
+   if (allData.constructor === Array){
       var dashedAttr;
-      var resArr = jsonObj.map(function(mut, i){
-      mut.attributes = {};
-      for (var prop in mut){
-        if (mut[prop] !== mut.attributes){
+      var resArr = allData.map(function(dataObj, i){
+      dataObj.attributes = {};
+      for (var prop in dataObj){
+        if (dataObj[prop] !== dataObj.attributes){
             dashedAttr = dasherize(prop);
-            mut.attributes[dashedAttr] = mut[prop];
-            delete mut[prop];
+            dataObj.attributes[dashedAttr] = dataObj[prop];
+            delete dataObj[prop];
           }
         }
         //mut.attributes.row_label = mut.attributes.mut;
         //delete  mut.attributes.mut;
-        mut.type = typeName;
-        mut.id =  mut.attributes._id;
-        return mut;
+        dataObj.type = typeName;
+        dataObj.id =  dataObj.attributes.id;
+        return dataObj;
       });
       var jsonApiDataObj = {
         "data": resArr
       };
      return jsonApiDataObj;
    }
-   else if (jsonObj.constructor === Object){
-     console.log("input is an object");
+   else if (allData.constructor === Object){
+     console.log("Error in server/jsonApiFormatter: Check if data input called in router is an acutal array.");
    }
 };
