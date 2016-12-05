@@ -85,7 +85,7 @@ exports.register = function(req, res, next) {
 
         let userInfo = setUserInfo(user);
 
-        res.status(201).json({
+        res.status(201).json({ // TODO: remove automatic JWT token response when user is registered
           token: 'JWT ' + generateToken(userInfo),
           user: userInfo
         });

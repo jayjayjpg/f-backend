@@ -38,6 +38,7 @@ const authRoutes = express.Router(),
 
 
   // Authentication Routes: Registration and Login
+  // Here the server's response to post requests for the /auth/register and the /auth/login routes are defined
   authRoutes.post('/register', AuthenticationController.register);
   authRoutes.post('/login', requireLogin, AuthenticationController.login);
 
