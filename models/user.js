@@ -19,7 +19,7 @@ const UserSchema = new Schema({
   },
   role: {
     type: String,
-    enum: ['Member', 'Client', 'Owner', 'Admin'],
+    enum: ['unverifiedMember','Member', 'Client', 'Owner', 'Admin'],
     default: 'Member'
   },
   resetPasswordToken: { type: String },
@@ -56,4 +56,5 @@ UserSchema.methods.comparePassword = function(candidatePassword, cb){
     cb(null, isMatch);
   });
 }
+
 module.exports = mongoose.model('User', UserSchema);

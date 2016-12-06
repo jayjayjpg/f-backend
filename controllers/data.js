@@ -23,7 +23,7 @@ exports.mutations = function(req, res, next) {
     queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
 
-  Mutation.find({}, function(err, muts){
+  Mutation.find(queryObj, function(err, muts){
     if (err) { 
       return next(err); 
     }
@@ -54,7 +54,7 @@ exports.snps = function(req, res, next) {
     queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
 
-  Snp.find({}, function(err, snps){
+  Snp.find(queryObj, function(err, snps){
     if (err) { 
       return next(err); 
     }
@@ -83,10 +83,10 @@ exports.interactions = function(req, res, next) {
   var intArr = [];
   if (req.query.rsId != undefined){
     var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
-    queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
+    queryObj = {targetSnp: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
 
-  Interaction.find({}, function(err, interactions){
+  Interaction.find(queryObj, function(err, interactions){
     if (err) { 
       return next(err); 
     }

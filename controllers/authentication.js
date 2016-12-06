@@ -22,14 +22,30 @@ function setUserInfo(request) {
 //========================================
 // Login Route
 //========================================
-exports.login = function(req, res, next) {
+exports.login = function(role) {
+  return function(req, res, next) {
+    let user = setUserInfo(req.user);
+   // const user = req.user;
 
-  let userInfo = setUserInfo(req.user);
+    User.findById(user._id, function(err, foundUser) {
+      if (err) {
+        res.status(422).json({ error: 'No user was found.' });
+        return next(err);
+      }
 
-  res.status(200).json({
-    token: 'JWT ' + generateToken(userInfo),
-    user: userInfo
-  });
+      // If user is found, check role.
+      if (foundUser.role == role) {
+          return res.status(200).json({
+            token: 'JWT ' + generateToken(user),
+            user: user
+          });
+          
+      }
+
+      res.status(401).json({ error: 'You are not authorized to view this content.' });
+      return next('Unauthorized');
+    })
+  }
 };
 
 
@@ -65,7 +81,16 @@ exports.register = function(req, res, next) {
 
       // If user is not unique, return error
       if (existingUser) {
-        return res.status(422).send({ error: 'That email address is already in use.' });
+        return res.status(422).json({
+            errors: [
+              {
+                status: "422",
+                source: { pointer: "authentication error" },
+                title:  "Invalid Credentials",
+                detail: "That email address is already in use."
+              }
+            ]
+          });
       }
 
       // If email is unique and password was provided, create account
@@ -85,17 +110,15 @@ exports.register = function(req, res, next) {
 
         let userInfo = setUserInfo(user);
 
-        res.status(201).json({ // TODO: remove automatic JWT token response when user is registered
-          token: 'JWT ' + generateToken(userInfo),
-          user: userInfo
-        });
+        res.status(201).json({ data: [{id: 1, type: "success", attributes: { title: "You successfully registered. Please await authorization by your admin." }  }] });
       });
   });
 };
 
 exports.roleAuthorization = function(role) {  
   return function(req, res, next) {
-    const user = req.user;
+    let user = setUserInfo(req.user);
+   // const user = req.user;
 
     User.findById(user._id, function(err, foundUser) {
       if (err) {
@@ -105,7 +128,11 @@ exports.roleAuthorization = function(role) {
 
       // If user is found, check role.
       if (foundUser.role == role) {
-        return next();
+          return res.status(200).json({
+            token: 'JWT ' + generateToken(user),
+            user: user
+          });
+          
       }
 
       res.status(401).json({ error: 'You are not authorized to view this content.' });

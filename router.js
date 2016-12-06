@@ -7,6 +7,7 @@ const AuthenticationController = require('./controllers/authentication'),
 
 const requireAuth = passport.authenticate('jwt', { session: false });  
 const requireLogin = passport.authenticate('local', { session: false });
+const logUserIn = AuthenticationController.login("Member");
 
 const REQUIRE_ADMIN = "Admin",  
       REQUIRE_OWNER = "Owner",
@@ -40,7 +41,7 @@ const authRoutes = express.Router(),
   // Authentication Routes: Registration and Login
   // Here the server's response to post requests for the /auth/register and the /auth/login routes are defined
   authRoutes.post('/register', AuthenticationController.register);
-  authRoutes.post('/login', requireLogin, AuthenticationController.login);
+  authRoutes.post('/login', requireLogin, logUserIn); // TODO: figure out if role authorization should be done after the login
 
   //=========================
   // Data Routes
