@@ -1,7 +1,7 @@
 const fs = require('fs');
 const Excel = require('exceljs');
 const dataFiles = {
-  'mutations': './server/interactions2.xlsx',
+  'mutations': './server/mutations.xlsx',
   'snps': './server/SNPannotation.xlsx',
   'interactions': './server/isnpnetwork.xlsx'
 };

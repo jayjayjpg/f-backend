@@ -34,6 +34,7 @@
     "passport-local": "^1.0.0"
   },
   "devDependencies": {
+    "exceljs": "^0.2.37",
     "nodemon": "^1.10.2"
   }
 }

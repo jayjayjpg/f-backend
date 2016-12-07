@@ -53,6 +53,10 @@ exports.snps = function(req, res, next) {
     var rsParam = req.query.rsId.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
     queryObj = {rsId: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
   }
+  if (req.query.region != undefined){
+    var rsParam = req.query.region.split(","); // sample rsIds: rs2425019 rs6088765 rs7404095
+    queryObj = {genomicRegion: { $in: rsParam } }; // TODO: reactivate SNP queries in the url now using mongoose
+  }
 
   Snp.find(queryObj, function(err, snps){
     if (err) { 
