@@ -1,5 +1,5 @@
 node_modules
-*.xlsx
-*.csv
-*.tsv
-server/data/*
+# *.xlsx
+# *.csv
+# *.tsv
+# server/data/*
