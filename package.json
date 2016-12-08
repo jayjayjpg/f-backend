@@ -36,5 +36,8 @@
   "devDependencies": {
     "exceljs": "^0.2.37",
     "nodemon": "^1.10.2"
+  },
+  "engines": {
+    "node": "6.2.2"
   }
 }
