@@ -42,7 +42,7 @@ Example:
       process.env.FOO // "bar"
 
 * HEROKUENV_FBE_SECRET - secret needed in JWT token encryption
-
+* MONDOB_URI - url of mLabs mongodb instance
 
 
 

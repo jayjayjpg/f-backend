@@ -58,8 +58,7 @@ exports.register = function(req, res, next) {
   const firstName = req.body["firstName"];
   const lastName = req.body["lastName"];
   const password = req.body["password"];
-  
- // console.log("request body is: " + JSON.stringify(req.body));
+
 
   // Return error if no email provided
   if (!email) {
